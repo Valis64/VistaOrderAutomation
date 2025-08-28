@@ -11,15 +11,16 @@ from automation.selectors import (
     CRIMPRESS_PASSWORD_INPUT,
     CRIMPRESS_SUBMIT_BUTTON,
 )
+from config.settings import DEFAULT_LOGIN_URL
 
 console = Console()
-LOGIN_URL = os.environ.get("CRIMPRESS_LOGIN_URL", "")
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
-def login(email: str, password: str) -> bool:
+def login(email: str, password: str, login_url: str | None = None) -> bool:
     """Attempt to authenticate to Crimpress."""
-    if not LOGIN_URL:
+    url = login_url or os.environ.get("CRIMPRESS_LOGIN_URL") or DEFAULT_LOGIN_URL
+    if not url:
         raise ValueError("CRIMPRESS_LOGIN_URL not set")
 
     with sync_playwright() as pw:
@@ -27,7 +28,7 @@ def login(email: str, password: str) -> bool:
         context = browser.new_context()
         page = context.new_page()
         console.log("Navigating to Crimpress login")
-        page.goto(LOGIN_URL)
+        page.goto(url)
         page.fill(CRIMPRESS_EMAIL_INPUT, email)
         page.fill(CRIMPRESS_PASSWORD_INPUT, password)
         page.click(CRIMPRESS_SUBMIT_BUTTON)

@@ -97,10 +97,16 @@ class MainWindow(ctk.CTk):
         self.art_path_entry = ctk.CTkEntry(config_frame, width=300)
         self.art_path_entry.grid(row=1, column=1, sticky="w")
 
+        ctk.CTkLabel(config_frame, text="Crimpress Login URL:").grid(
+            row=2, column=0, sticky="e", padx=(0, 5)
+        )
+        self.login_url_entry = ctk.CTkEntry(config_frame, width=300)
+        self.login_url_entry.grid(row=2, column=1, sticky="w")
+
         config_save = ctk.CTkButton(
             config_frame, text="Save", command=self._save_program_settings
         )
-        config_save.grid(row=2, column=0, columnspan=2, pady=(10, 0))
+        config_save.grid(row=3, column=0, columnspan=2, pady=(10, 0))
 
         # Load stored credentials if present
         email, password = load_credentials()
@@ -113,6 +119,9 @@ class MainWindow(ctk.CTk):
         art_root = settings.get("art_root", "")
         if art_root:
             self.art_path_entry.insert(0, art_root)
+        login_url = settings.get("login_url", "")
+        if login_url:
+            self.login_url_entry.insert(0, login_url)
 
     def _save_credentials(self) -> None:
         email = self.email_entry.get()
@@ -127,9 +136,10 @@ class MainWindow(ctk.CTk):
     def _test_login(self) -> None:
         email = self.email_entry.get()
         password = self.password_entry.get()
+        login_url = self.login_url_entry.get()
         if email and password:
             try:
-                success = crimpress_login(email, password)
+                success = crimpress_login(email, password, login_url)
                 print("Login test successful" if success else "Login test failed")
             except Exception as exc:
                 success = False
@@ -140,8 +150,9 @@ class MainWindow(ctk.CTk):
 
     def _save_program_settings(self) -> None:
         art_root = self.art_path_entry.get()
+        login_url = self.login_url_entry.get()
         try:
-            save_settings(art_root)
+            save_settings(art_root, login_url)
             print("Program settings saved")
         except Exception as exc:
             self._log_error(exc)

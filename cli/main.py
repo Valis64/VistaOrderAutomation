@@ -5,6 +5,7 @@ import typer
 from rich.console import Console
 
 from config.credentials import load_credentials
+from config.settings import load_settings
 from gui.main import main as gui_main
 from services.crimpress import login as crimpress_login
 
@@ -25,8 +26,10 @@ def login() -> None:
     if not email or not password:
         console.print("Credentials not found", style="red")
         raise typer.Exit(code=1)
+    settings = load_settings()
+    login_url = settings.get("login_url", "")
     try:
-        success = crimpress_login(email, password)
+        success = crimpress_login(email, password, login_url)
     except Exception as exc:  # pragma: no cover - network errors
         console.print(f"Login failed: {exc}", style="red")
         raise typer.Exit(code=1)

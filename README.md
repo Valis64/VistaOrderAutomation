@@ -11,7 +11,7 @@ Vista Order Automation streamlines order ingestion across partner sites, our web
 ## Requirements
 - Python 3.10+
 - Dependencies from `requirements.txt`
-- Environment variable `CRIMPRESS_LOGIN_URL` pointing to the Crimpress login page.
+- Crimpress login URL provided via the `CRIMPRESS_LOGIN_URL` environment variable or configured in the Settings tab (default URL is prefilled).
 
 Install dependencies:
 ```bash
@@ -25,9 +25,9 @@ python -m cli gui
 ```
 1. Open the **Settings** tab.
 2. Enter Crimpress email and password.
-3. Click **Test** to attempt a real login. The indicator turns green on success or red on failure.
-4. Click **Save** to store credentials in the OS keyring.
-5. Set the art server path and save program settings.
+3. Adjust the Crimpress login URL if needed and set the art server path.
+4. Click **Test** to attempt a real login. The indicator turns green on success or red on failure.
+5. Click **Save** to store credentials and program settings.
 
 ## CLI Usage
 - `python -m cli login` – test Crimpress login using stored credentials.

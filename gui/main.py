@@ -47,8 +47,11 @@ class MainWindow(ctk.CTk):
         )
         self.status_indicator.grid(row=1, column=2, rowspan=2, padx=10)
 
+        test_button = ctk.CTkButton(logins_frame, text="Test", command=self._test_login)
+        test_button.grid(row=3, column=0, pady=(10, 0))
+
         save_button = ctk.CTkButton(logins_frame, text="Save", command=self._save_credentials)
-        save_button.grid(row=3, column=0, columnspan=3, pady=(10, 0))
+        save_button.grid(row=3, column=1, columnspan=2, pady=(10, 0))
 
         # Program settings frame
         config_frame = ctk.CTkFrame(self.settings_tab)
@@ -85,6 +88,11 @@ class MainWindow(ctk.CTk):
         email = self.email_entry.get()
         password = self.password_entry.get()
         save_credentials(email, password)
+        self._test_login()
+
+    def _test_login(self) -> None:
+        email = self.email_entry.get()
+        password = self.password_entry.get()
         if email and password:
             try:
                 success = crimpress_login(email, password)

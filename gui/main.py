@@ -4,6 +4,7 @@ from __future__ import annotations
 import customtkinter as ctk
 
 from config.credentials import load_credentials, save_credentials
+from services.crimpress import login as crimpress_login
 
 
 class MainWindow(ctk.CTk):
@@ -58,7 +59,11 @@ class MainWindow(ctk.CTk):
         password = self.password_entry.get()
         save_credentials(email, password)
         if email and password:
-            self.status_indicator.configure(fg_color="green")
+            try:
+                success = crimpress_login(email, password)
+            except Exception:
+                success = False
+            self.status_indicator.configure(fg_color="green" if success else "red")
         else:
             self.status_indicator.configure(fg_color="red")
 

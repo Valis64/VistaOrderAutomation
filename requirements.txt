@@ -1,2 +1,6 @@
 customtkinter
 keyring
+typer
+playwright
+rich
+tenacity

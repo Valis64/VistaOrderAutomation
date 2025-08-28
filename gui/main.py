@@ -6,6 +6,24 @@ import customtkinter as ctk
 from config.credentials import load_credentials, save_credentials
 from config.settings import load_settings, save_settings
 from services.crimpress import login as crimpress_login
+import sys
+import traceback
+
+
+class TextboxRedirector:
+    """Redirects writes to a CTkTextbox."""
+
+    def __init__(self, textbox: ctk.CTkTextbox) -> None:
+        self.textbox = textbox
+
+    def write(self, message: str) -> None:
+        self.textbox.configure(state="normal")
+        self.textbox.insert("end", message)
+        self.textbox.see("end")
+        self.textbox.configure(state="disabled")
+
+    def flush(self) -> None:
+        pass
 
 
 class MainWindow(ctk.CTk):
@@ -16,8 +34,20 @@ class MainWindow(ctk.CTk):
         self.title("Vista Order Automation")
         self.geometry("600x400")
 
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
         self.tabview = ctk.CTkTabview(self)
-        self.tabview.pack(expand=True, fill="both")
+        self.tabview.grid(row=0, column=0, sticky="nsew")
+
+        self.terminal = ctk.CTkTextbox(self, height=120)
+        self.terminal.grid(row=1, column=0, sticky="ew")
+        self.terminal.configure(state="disabled")
+
+        redirector = TextboxRedirector(self.terminal)
+        sys.stdout = redirector
+        sys.stderr = redirector
+        sys.excepthook = self._exception_hook
 
         self.tabview.add("Home")
         self.settings_tab = self.tabview.add("Settings")
@@ -87,8 +117,12 @@ class MainWindow(ctk.CTk):
     def _save_credentials(self) -> None:
         email = self.email_entry.get()
         password = self.password_entry.get()
-        save_credentials(email, password)
-        self._test_login()
+        try:
+            save_credentials(email, password)
+            print("Credentials saved")
+            self._test_login()
+        except Exception as exc:
+            self._log_error(exc)
 
     def _test_login(self) -> None:
         email = self.email_entry.get()
@@ -96,15 +130,31 @@ class MainWindow(ctk.CTk):
         if email and password:
             try:
                 success = crimpress_login(email, password)
-            except Exception:
+                print("Login test successful" if success else "Login test failed")
+            except Exception as exc:
                 success = False
+                self._log_error(exc)
             self.status_indicator.configure(fg_color="green" if success else "red")
         else:
             self.status_indicator.configure(fg_color="red")
 
     def _save_program_settings(self) -> None:
         art_root = self.art_path_entry.get()
-        save_settings(art_root)
+        try:
+            save_settings(art_root)
+            print("Program settings saved")
+        except Exception as exc:
+            self._log_error(exc)
+
+    def _log_error(self, exc: Exception) -> None:
+        print(f"{type(exc).__name__}: {exc}")
+        traceback.print_exc()
+
+    def _exception_hook(self, exc_type, exc, tb) -> None:
+        self.terminal.configure(state="normal")
+        self.terminal.insert("end", "".join(traceback.format_exception(exc_type, exc, tb)))
+        self.terminal.see("end")
+        self.terminal.configure(state="disabled")
 
 
 def main() -> None:

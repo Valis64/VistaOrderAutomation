@@ -34,3 +34,33 @@ python -m cli gui
 - `python -m cli gui` – launch the GUI from the command line.
 
 Stored credentials can be cleared using your platform's keyring tools. Program settings are written to `~/.vista_order_settings.json`.
+
+## Vista Art Fetcher
+
+Fetch artwork assets from Vista's POM portal.
+
+### Environment variables
+
+Set the following before running:
+
+- `POM_USERNAME` and `POM_PASSWORD`
+- `POM_TOTP_SECRET` *(optional for two-factor auth)*
+
+### Dependency installation
+
+```bash
+pip install -r requirements.txt
+playwright install
+```
+
+### CLI usage
+
+```bash
+python vista_fetch.py
+HEADFUL=1 python vista_fetch.py
+python -m cli fetch
+```
+
+### Output
+
+Files download into `Vista/<order-id>/` folders with sanitized order IDs. Existing files with matching sizes and ETags are skipped, so repeated runs are idempotent. If implemented, a `manifest.json` summary is written alongside the downloaded art.

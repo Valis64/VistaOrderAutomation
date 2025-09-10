@@ -4,3 +4,4 @@ typer
 playwright
 rich
 tenacity
+requests

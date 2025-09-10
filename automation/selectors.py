@@ -8,6 +8,7 @@ CRIMPRESS_SUBMIT_BUTTON = "button.auth0-lock-submit"
 
 # POM (Cimpress) login page selectors
 POM_USERNAME_INPUT = "input[name='username']"  # Username field
+POM_EMAIL_INPUT = "input[name='email']"  # Fallback email field
 POM_PASSWORD_INPUT = "input[name='password']"  # Password field
 POM_SUBMIT_BUTTON = "button[type='submit']"  # Login submit button
 POM_TOTP_INPUT = "input[name='code']"

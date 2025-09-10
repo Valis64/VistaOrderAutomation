@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Iterator, Tuple
 
 import requests
-from playwright.sync_api import BrowserContext, ElementHandle, Page
+from playwright.sync_api import BrowserContext, ElementHandle, Page, TimeoutError as PlaywrightTimeoutError
 from rich.console import Console
 from tenacity import retry, stop_after_attempt, wait_exponential
 
@@ -78,7 +78,14 @@ def login(context: BrowserContext) -> None:
     page.goto("https://pom.cimpress.io/")
     # Wait for the redirect to the actual login URL before interacting.
     page.wait_for_url(re.compile(r"https://cimpress\.auth0\.com/.*"))
-    page.fill(selectors.POM_USERNAME_INPUT, username)
+    # Auth0 occasionally labels the identifier field as either username or email.
+    user_selector = selectors.POM_USERNAME_INPUT
+    try:
+        page.wait_for_selector(user_selector, timeout=10_000)
+    except PlaywrightTimeoutError:
+        user_selector = selectors.POM_EMAIL_INPUT
+        page.wait_for_selector(user_selector, timeout=10_000)
+    page.fill(user_selector, username)
     page.fill(selectors.POM_PASSWORD_INPUT, password)
     page.click(selectors.POM_SUBMIT_BUTTON)
     if secret:

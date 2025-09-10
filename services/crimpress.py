@@ -25,18 +25,21 @@ def login(email: str, password: str) -> bool:
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=True)
         context = browser.new_context()
-        page = context.new_page()
-        console.log("Navigating to Crimpress login")
-        page.goto(LOGIN_URL)
-        page.fill(CRIMPRESS_EMAIL_INPUT, email)
-        page.fill(CRIMPRESS_PASSWORD_INPUT, password)
-        page.click(CRIMPRESS_SUBMIT_BUTTON)
         try:
-            page.wait_for_load_state("networkidle")
-        except Error:
-            console.log("Network idle wait timed out", style="red")
+            page = context.new_page()
+            console.log("Navigating to Crimpress login")
+            page.goto(LOGIN_URL)
+            page.fill(CRIMPRESS_EMAIL_INPUT, email)
+            page.fill(CRIMPRESS_PASSWORD_INPUT, password)
+            page.click(CRIMPRESS_SUBMIT_BUTTON)
+            try:
+                page.wait_for_load_state("networkidle")
+            except Error:
+                console.log("Network idle wait timed out", style="red")
+                return False
+            success = not page.locator(CRIMPRESS_EMAIL_INPUT).is_visible()
+            return success
+        finally:
+            # Ensure context is closed before shutting down the browser
+            context.close()
             browser.close()
-            return False
-        success = not page.locator(CRIMPRESS_EMAIL_INPUT).is_visible()
-        browser.close()
-        return success

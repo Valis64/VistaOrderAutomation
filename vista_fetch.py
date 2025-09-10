@@ -70,7 +70,7 @@ def _login(page: Page, username: str, password: str, secret: Optional[str]) -> N
     page.goto("https://pom.cimpress.io/")
     page.fill(selectors.POM_USERNAME_INPUT, username)
     page.fill(selectors.POM_PASSWORD_INPUT, password)
-    page.click(selectors.POM_LOGIN_BUTTON)
+    page.click(selectors.POM_SUBMIT_BUTTON)
     if secret:
         code = _totp_code(secret)
         page.fill(selectors.POM_TOTP_INPUT, code)
@@ -111,10 +111,10 @@ def main(
             if not rows:
                 break
             for row in rows:
-                oid = row.get_attribute("data-orderid") or row.query_selector(selectors.POM_ORDER_ID).inner_text().strip()
+                oid = row.get_attribute("data-orderid") or row.query_selector(selectors.POM_ORDER_ROW_ID_LABEL).inner_text().strip()
                 order_dir = Path("Vista") / oid
                 order_dir.mkdir(parents=True, exist_ok=True)
-                links = row.query_selector_all(selectors.POM_ART_FILE_LINK)
+                links = row.query_selector_all(selectors.POM_ART_DOWNLOAD_LINK)
                 for link in links:
                     url = link.get_attribute("href")
                     fname = order_dir / Path(url.split("/")[-1])
@@ -124,7 +124,7 @@ def main(
                     if downloaded:
                         files += 1
                 orders += 1
-            next_btn = page.query_selector(selectors.POM_NEXT_BUTTON)
+            next_btn = page.query_selector(selectors.POM_NEXT_PAGE_BUTTON)
             if not next_btn or "disabled" in (next_btn.get_attribute("class") or ""):
                 break
             next_btn.click()

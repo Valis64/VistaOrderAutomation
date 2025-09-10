@@ -1,6 +1,9 @@
 """Command-line interface for Vista Order Automation."""
 from __future__ import annotations
 
+from datetime import date
+from typing import Optional
+
 import typer
 from rich.console import Console
 
@@ -35,6 +38,26 @@ def login() -> None:
     else:
         console.print("Login failed", style="red")
         raise typer.Exit(code=1)
+
+
+@app.command()
+def fetch(
+    headful: bool = typer.Option(False, help="Run browser with a visible UI."),
+    only: Optional[str] = typer.Option(None, "--only", metavar="ORDER_ID", help="Fetch a single order by ID."),
+    since: Optional[date] = typer.Option(
+        None,
+        "--since",
+        metavar="YYYY-MM-DD",
+        formats=["%Y-%m-%d"],
+        help="Fetch orders since this date.",
+    ),
+) -> None:
+    """Fetch Vista orders and download art files."""
+    import vista_fetch
+
+    # Mirror progress logs in this console
+    vista_fetch.console = console
+    vista_fetch.main(headless=not headful, only=only, since=since)
 
 
 if __name__ == "__main__":

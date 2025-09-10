@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+from dotenv import load_dotenv
 from tenacity import retry, stop_after_attempt, wait_fixed
 from playwright.sync_api import Error, sync_playwright
 from rich.console import Console
@@ -12,14 +13,16 @@ from automation.selectors import (
     CRIMPRESS_SUBMIT_BUTTON,
 )
 
+load_dotenv()
+
 console = Console()
-LOGIN_URL = os.environ.get("CRIMPRESS_LOGIN_URL", "")
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
 def login(email: str, password: str) -> bool:
     """Attempt to authenticate to Crimpress."""
-    if not LOGIN_URL:
+    login_url = os.environ.get("CRIMPRESS_LOGIN_URL")
+    if not login_url:
         raise ValueError("CRIMPRESS_LOGIN_URL not set")
 
     with sync_playwright() as pw:
@@ -28,7 +31,7 @@ def login(email: str, password: str) -> bool:
         try:
             page = context.new_page()
             console.log("Navigating to Crimpress login")
-            page.goto(LOGIN_URL)
+            page.goto(login_url)
             page.fill(CRIMPRESS_EMAIL_INPUT, email)
             page.fill(CRIMPRESS_PASSWORD_INPUT, password)
             page.click(CRIMPRESS_SUBMIT_BUTTON)

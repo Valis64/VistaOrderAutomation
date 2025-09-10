@@ -6,3 +6,4 @@ rich
 tenacity
 requests
 pyotp
+python-dotenv

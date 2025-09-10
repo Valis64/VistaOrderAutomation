@@ -10,7 +10,7 @@ Vista Order Automation streamlines order ingestion across partner sites, our web
 
 ## Requirements
 - Python 3.10+
-- Dependencies from `requirements.txt`
+- Dependencies from `requirements.txt` (including `pyotp`)
 - Environment variable `CRIMPRESS_LOGIN_URL` pointing to the Crimpress login page.
 
 Install dependencies:

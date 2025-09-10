@@ -5,3 +5,4 @@ playwright
 rich
 tenacity
 requests
+pyotp

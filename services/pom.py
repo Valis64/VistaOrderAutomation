@@ -5,6 +5,7 @@ import base64
 import hashlib
 import hmac
 import os
+import re
 import struct
 import time
 from pathlib import Path
@@ -73,7 +74,10 @@ def login(context: BrowserContext) -> None:
     secret = os.getenv("POM_TOTP_SECRET")
 
     page = context.new_page()
+    # Navigate to the POM portal which will redirect to the Auth0 login page.
     page.goto("https://pom.cimpress.io/")
+    # Wait for the redirect to the actual login URL before interacting.
+    page.wait_for_url(re.compile(r"https://cimpress\.auth0\.com/.*"))
     page.fill(selectors.POM_USERNAME_INPUT, username)
     page.fill(selectors.POM_PASSWORD_INPUT, password)
     page.click(selectors.POM_SUBMIT_BUTTON)

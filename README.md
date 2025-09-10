@@ -11,11 +11,15 @@ Vista Order Automation streamlines order ingestion across partner sites, our web
 ## Requirements
 - Python 3.10+
 - Dependencies from `requirements.txt` (including `pyotp`)
-- Environment variable `CRIMPRESS_LOGIN_URL` pointing to the Crimpress login page.
+- Environment variable `CRIMPRESS_LOGIN_URL` pointing to the Crimpress login page. This variable may be stored in a `.env` file in the project root.
 
 Install dependencies:
 ```bash
 pip install -r requirements.txt
+```
+Create a `.env` file with the Crimpress login URL:
+```bash
+echo "CRIMPRESS_LOGIN_URL=https://<crimpress-login-page>" > .env
 ```
 
 ## GUI Usage
